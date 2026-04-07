@@ -2,12 +2,10 @@ import numpy as np
 from PIL import Image, ImageTk
 from tkinter import Canvas, Tk
 
-def compress_channel(channel, k, gain=5.0):
+def compress_channel(channel, k):
     U, S, Vt = np.linalg.svd(channel, full_matrices=False)
-    S_noise = np.zeros_like(S)
-    S_noise[k:] = S[k:]  #for noise isolation
     
-    reconstructed = np.dot(U * S_noise, Vt) * gain + 128
+    reconstructed = np.dot(U[:, :k] * S[:k], Vt[:k, :]) 
     return reconstructed
 
 def main():
@@ -25,7 +23,7 @@ def main():
     canvas = Canvas(root, width=w, height=h, bg="white")
     canvas.pack()
 
-    k = 50
+    k = 5
     
     compressed_channels = []
     for i in range(3):
